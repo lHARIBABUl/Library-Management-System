@@ -1,0 +1,452 @@
+-- Create Database
+
+CREATE DATABASE IF NOT EXISTS library_db;
+
+USE library_db;
+
+-- Drop Existing Tables
+
+DROP TABLE IF EXISTS bookIssues;
+DROP TABLE IF EXISTS books;
+DROP TABLE IF EXISTS students;
+
+-- Create Books Table
+
+CREATE TABLE books (
+    book_id INT PRIMARY KEY AUTO_INCREMENT,
+    book_name VARCHAR(100) NOT NULL,
+    author VARCHAR(100),
+    quantity INT DEFAULT 1
+);
+
+-- Create Students Table
+
+CREATE TABLE students (
+    studentID INT PRIMARY KEY AUTO_INCREMENT,
+    studentName VARCHAR(50) NOT NULL,
+    department VARCHAR(50),
+    phoneNumber VARCHAR(15)
+);
+
+-- Create Book Issues Table
+
+CREATE TABLE bookIssues (
+    issueID INT PRIMARY KEY AUTO_INCREMENT,
+    book_id INT,
+    studentID INT,
+    issueDate DATE,
+    returnDate DATE,
+    status VARCHAR(20) DEFAULT 'Issued',
+    FOREIGN KEY (book_id) REFERENCES books(book_id),
+    FOREIGN KEY (studentID) REFERENCES students(studentID)
+);
+
+-- Insert Books
+
+INSERT INTO books
+(book_name, author, quantity)
+VALUES
+('Python Programming', 'John Smith', 5),
+('HTML and CSS', 'David Miller', 3),
+('MySQL Basics', 'James Brown', 4),
+('Java Programming', 'Robert Martin', 6),
+('JavaScript Basics', 'David Johnson', 5),
+('React JS', 'Dan Abramov', 3),
+('C Programming', 'Dennis Ritchie', 4),
+('C++ Programming', 'Bjarne Stroustrup', 2),
+('Data Structures', 'Mark Allen', 5),
+('Computer Networks', 'Andrew Tanenbaum', 3);
+
+-- Insert Students
+
+INSERT INTO students
+(studentName, department, phoneNumber)
+VALUES
+('Arun', 'CSE', '9876543210'),
+('Priya', 'IT', '9876543211'),
+('Kumar', 'ECE', '9876543212'),
+('Rahul', 'CSE', '9876543213'),
+('Divya', 'IT', '9876543214'),
+('Vijay', 'EEE', '9876543215'),
+('Anitha', 'CSE', '9876543216'),
+('Suresh', 'ECE', '9876543217'),
+('Meena', 'IT', '9876543218'),
+('Karthik', 'CSE', '9876543219');
+
+-- Insert Book Issues
+
+INSERT INTO bookIssues
+(book_id, studentID, issueDate, returnDate, status)
+VALUES
+(1, 1, '2026-11-01', NULL, 'Issued'),
+(2, 2, '2026-11-02', '2026-11-08', 'Returned'),
+(3, 3, '2026-11-03', NULL, 'Issued'),
+(4, 4, '2026-11-04', '2026-11-10', 'Returned'),
+(5, 5, '2026-11-05', NULL, 'Issued'),
+(6, 6, '2026-11-06', NULL, 'Issued'),
+(7, 7, '2026-11-07', '2026-11-12', 'Returned'),
+(8, 8, '2026-11-08', NULL, 'Issued'),
+(9, 9, '2026-11-09', '2026-11-15', 'Returned'),
+(10, 10, '2026-11-10', NULL, 'Issued');
+
+-- Display All Books
+
+SELECT * FROM books;
+
+-- Display All Students
+
+SELECT * FROM students;
+
+-- Display All Book Issues
+
+SELECT * FROM bookIssues;
+
+-- Search Books
+
+SELECT *
+FROM books
+WHERE book_name LIKE '%Java%';
+
+-- Search Students
+
+SELECT *
+FROM students
+WHERE studentName LIKE '%Arun%';
+
+-- Books With Quantity Greater Than 3
+
+SELECT *
+FROM books
+WHERE quantity > 3;
+
+-- Books With Quantity Less Than 4
+
+SELECT *
+FROM books
+WHERE quantity < 4;
+
+-- Sort Books By Name
+
+SELECT *
+FROM books
+ORDER BY book_name ASC;
+
+-- Sort Books By Quantity
+
+SELECT *
+FROM books
+ORDER BY quantity DESC;
+
+-- Count Total Books
+
+SELECT COUNT(*) AS total_books
+FROM books;
+
+-- Count Total Students
+
+SELECT COUNT(*) AS total_students
+FROM students;
+
+-- Total Book Quantity
+
+SELECT SUM(quantity) AS total_book_quantity
+FROM books;
+
+-- Average Book Quantity
+
+SELECT AVG(quantity) AS average_quantity
+FROM books;
+
+-- Maximum Book Quantity
+
+SELECT MAX(quantity) AS maximum_quantity
+FROM books;
+
+-- Minimum Book Quantity
+
+SELECT MIN(quantity) AS minimum_quantity
+FROM books;
+
+-- Students By Department
+
+SELECT
+    department,
+    COUNT(*) AS student_count
+FROM students
+GROUP BY department;
+
+-- Departments With More Than 2 Students
+
+SELECT
+    department,
+    COUNT(*) AS student_count
+FROM students
+GROUP BY department
+HAVING COUNT(*) > 2;
+
+-- Display Complete Issue Details
+
+SELECT
+    bookIssues.issueID,
+    students.studentName,
+    students.department,
+    books.book_name,
+    books.author,
+    bookIssues.issueDate,
+    bookIssues.returnDate,
+    bookIssues.status
+FROM bookIssues
+JOIN students
+    ON bookIssues.studentID = students.studentID
+JOIN books
+    ON bookIssues.book_id = books.book_id;
+
+-- Display Issued Books
+
+SELECT
+    students.studentName,
+    books.book_name,
+    bookIssues.issueDate
+FROM bookIssues
+JOIN students
+    ON bookIssues.studentID = students.studentID
+JOIN books
+    ON bookIssues.book_id = books.book_id
+WHERE bookIssues.status = 'Issued';
+
+-- Display Returned Books
+
+SELECT
+    students.studentName,
+    books.book_name,
+    bookIssues.issueDate,
+    bookIssues.returnDate
+FROM bookIssues
+JOIN students
+    ON bookIssues.studentID = students.studentID
+JOIN books
+    ON bookIssues.book_id = books.book_id
+WHERE bookIssues.status = 'Returned';
+
+-- Display CSE Student Issues
+
+SELECT
+    students.studentName,
+    students.department,
+    books.book_name,
+    bookIssues.status
+FROM bookIssues
+JOIN students
+    ON bookIssues.studentID = students.studentID
+JOIN books
+    ON bookIssues.book_id = books.book_id
+WHERE students.department = 'CSE';
+
+-- Update Book Quantity
+
+UPDATE books
+SET quantity = 10
+WHERE book_id = 1;
+
+-- Update Student Phone Number
+
+UPDATE students
+SET phoneNumber = '9000000000'
+WHERE studentID = 1;
+
+-- Update Book Author
+
+UPDATE books
+SET author = 'Updated Author'
+WHERE book_id = 2;
+
+-- Return Book
+
+UPDATE bookIssues
+SET status = 'Returned',
+    returnDate = CURDATE()
+WHERE issueID = 1;
+
+-- Issue New Book
+
+INSERT INTO bookIssues
+(book_id, studentID, issueDate, returnDate, status)
+VALUES
+(1, 2, CURDATE(), NULL, 'Issued');
+
+-- Count Issued Books
+
+SELECT COUNT(*) AS total_issued_books
+FROM bookIssues
+WHERE status = 'Issued';
+
+-- Count Returned Books
+
+SELECT COUNT(*) AS total_returned_books
+FROM bookIssues
+WHERE status = 'Returned';
+
+-- Group Issues By Status
+
+SELECT
+    status,
+    COUNT(*) AS total
+FROM bookIssues
+GROUP BY status;
+
+-- Group Issues By Student
+
+SELECT
+    studentID,
+    COUNT(*) AS books_taken
+FROM bookIssues
+GROUP BY studentID;
+
+-- Students Who Issued More Than 1 Book
+
+SELECT
+    studentID,
+    COUNT(*) AS books_taken
+FROM bookIssues
+GROUP BY studentID
+HAVING COUNT(*) > 1;
+
+-- Books Above Average Quantity
+
+SELECT *
+FROM books
+WHERE quantity > (
+    SELECT AVG(quantity)
+    FROM books
+);
+
+-- Students Who Issued Books
+
+SELECT *
+FROM students
+WHERE studentID IN (
+    SELECT studentID
+    FROM bookIssues
+);
+
+-- Books That Were Issued
+
+SELECT *
+FROM books
+WHERE book_id IN (
+    SELECT book_id
+    FROM bookIssues
+);
+
+-- Books Never Issued
+
+SELECT *
+FROM books
+WHERE book_id NOT IN (
+    SELECT book_id
+    FROM bookIssues
+);
+
+-- Students Who Never Issued Books
+
+SELECT *
+FROM students
+WHERE studentID NOT IN (
+    SELECT studentID
+    FROM bookIssues
+);
+
+-- Create Issue Details View
+
+CREATE OR REPLACE VIEW issue_details AS
+SELECT
+    bookIssues.issueID,
+    students.studentName,
+    students.department,
+    books.book_name,
+    books.author,
+    bookIssues.issueDate,
+    bookIssues.returnDate,
+    bookIssues.status
+FROM bookIssues
+JOIN students
+    ON bookIssues.studentID = students.studentID
+JOIN books
+    ON bookIssues.book_id = books.book_id;
+
+-- Display Issue Details View
+
+SELECT *
+FROM issue_details;
+
+-- Display Currently Issued Books
+
+SELECT *
+FROM issue_details
+WHERE status = 'Issued';
+
+-- Display Returned Books
+
+SELECT *
+FROM issue_details
+WHERE status = 'Returned';
+
+-- Sort Issues By Date
+
+SELECT *
+FROM issue_details
+ORDER BY issueDate DESC;
+
+-- Top 3 Books By Quantity
+
+SELECT *
+FROM books
+ORDER BY quantity DESC
+LIMIT 3;
+
+-- Check Book Availability
+
+SELECT
+    book_name,
+    quantity,
+    CASE
+        WHEN quantity > 0 THEN 'Available'
+        ELSE 'Not Available'
+    END AS availability
+FROM books;
+
+-- Student Issue Count
+
+SELECT
+    students.studentName,
+    COUNT(bookIssues.issueID) AS total_issues
+FROM students
+LEFT JOIN bookIssues
+    ON students.studentID = bookIssues.studentID
+GROUP BY students.studentID, students.studentName;
+
+-- Book Issue Count
+
+SELECT
+    books.book_name,
+    COUNT(bookIssues.issueID) AS issue_count
+FROM books
+LEFT JOIN bookIssues
+    ON books.book_id = bookIssues.book_id
+GROUP BY books.book_id, books.book_name;
+
+-- Check Table Structure
+
+DESC books;
+
+DESC students;
+
+DESC bookIssues;
+
+-- Show All Tables
+
+SHOW TABLES;
+
+-- Show All Databases
+
+SHOW DATABASES;
